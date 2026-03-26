@@ -8,9 +8,19 @@ Built on the [Model Context Protocol](https://modelcontextprotocol.io) by [David
 
 ---
 
-## Quick start
+## Integration model
 
-Clone, install, and run locally in under a minute:
+This is a developer and platform-facing project, not a shared consumer endpoint.
+
+- The [public website](https://uk-jobs-mcp-site.vercel.app) is a documentation and marketing site only
+- The MCP server is designed to be run locally or deployed by integrators against their own data
+- A public shared endpoint is not currently provided — wire the stubs to your own data source and deploy
+
+If you're a job board, ATS, or recruitment platform looking to expose your data to AI assistants, this is your starting point.
+
+---
+
+## Quick start
 
 ```bash
 git clone https://github.com/mccaigs/uk-jobs-mcp
@@ -18,7 +28,7 @@ cd uk-jobs-mcp
 npm install && npm run dev
 ```
 
-Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+Add to Claude Desktop (`~/Library/Application Support/Claude/claude_desktop_config.json`):
 
 ```json
 {
@@ -32,8 +42,6 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 ```
 
 Then ask Claude: **"Find AI contract roles in London outside IR35 over £600/day"**
-
-A managed hosted instance is on the way. Watch this repo for updates.
 
 ---
 
