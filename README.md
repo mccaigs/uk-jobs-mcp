@@ -12,9 +12,9 @@ Built on the [Model Context Protocol](https://modelcontextprotocol.io) by [David
 
 I've spent more hours than I care to admit filling in the same information on job platforms over and over again.
 
-Name. Location. Skills. Rate. Availability. Notice period. Preferred work mode. Employment type. IR35 preference.
+Name. Location. Skills. Rate. Availability. Notice period. Preferred work mode. Contract or permanent. PAYE or outside IR35.
 
-Every. Single. Platform. Asks. The. Same. Questions.
+And every single platform asks for all of it, every time.
 
 It's 2026. AI assistants can book restaurants, manage calendars, and write code — but somehow job hunting still means manually re-keying your entire professional history into another identical form, on another identical platform, for the fifth time this week.
 
@@ -72,41 +72,9 @@ This is a **generic standard** — not tied to any one platform's proprietary da
 
 ## Connecting to this server
 
-### Claude Desktop
+A hosted public instance is coming soon. In the meantime, clone the repo and run it locally against your own data source.
 
-Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "uk-jobs": {
-      "command": "npx",
-      "args": ["-y", "uk-jobs-mcp"],
-      "env": {
-        "BASE_URL": "https://mcp.careersai.co.uk"
-      }
-    }
-  }
-}
-```
-
-### Any MCP-compatible host
-
-Point your MCP client at:
-
-```
-POST https://mcp.careersai.co.uk/mcp
-```
-
-Discovery:
-
-```
-GET https://mcp.careersai.co.uk/.well-known/mcp.json
-```
-
----
-
-## Running locally
+### Running locally
 
 ```bash
 npm install
@@ -128,6 +96,29 @@ Test with the MCP Inspector:
 npm run inspector
 ```
 
+### Claude Desktop (local)
+
+Once running locally, add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "uk-jobs": {
+      "command": "npx",
+      "args": ["-y", "uk-jobs-mcp"]
+    }
+  }
+}
+```
+
+### Deploying your own hosted instance
+
+Fork this repo, replace the stubs in `src/tools/` with queries to your own data source, and deploy to your platform of choice. Set the `BASE_URL` environment variable to your domain — the discovery endpoints and auth metadata will advertise it automatically.
+
+```bash
+BASE_URL=https://your-domain.com npm start
+```
+
 ---
 
 ## Authentication
@@ -139,7 +130,7 @@ Protected tools use OAuth 2.1 with PKCE. When an unauthenticated request reaches
 ```http
 HTTP/1.1 401 Unauthorized
 WWW-Authenticate: Bearer realm="uk-jobs-mcp",
-  resource_metadata="https://mcp.careersai.co.uk/.well-known/oauth-protected-resource"
+  resource_metadata="https://your-domain.com/.well-known/oauth-protected-resource"
 ```
 
 The client fetches the Protected Resource Metadata document to discover the authorisation server and available scopes, then completes a standard PKCE flow.
@@ -171,10 +162,6 @@ The schema in `src/types.ts` is the canonical field definition. Contributions to
 ## Built with uk-jobs-mcp?
 
 If you've implemented this standard on your platform, or built something using it, open a PR to add yourself here.
-
-| Project | Description |
-|---|---|
-| [CareersAI](https://careersai.co.uk) | Reference implementation — AI-powered job matching for candidates and recruiters |
 
 ---
 
