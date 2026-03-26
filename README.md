@@ -1,10 +1,83 @@
 # uk-jobs-mcp
 
-**The standard MCP interface for UK recruitment data.**
+**The standard MCP interface for UK recruitment data — enabling AI agents to access jobs as structured tools instead of scraping.**
 
 An open MCP server that gives any AI assistant structured access to UK job listings, market intelligence, and candidate availability — using a common, platform-neutral schema.
 
 Built on the [Model Context Protocol](https://modelcontextprotocol.io) by [David Robertson](https://www.linkedin.com/in/daverobertson4/).
+
+---
+
+## Quick start
+
+Clone, install, and run locally in under a minute:
+
+```bash
+git clone https://github.com/mccaigs/uk-jobs-mcp
+cd uk-jobs-mcp
+npm install && npm run dev
+```
+
+Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "uk-jobs": {
+      "command": "npx",
+      "args": ["-y", "uk-jobs-mcp"]
+    }
+  }
+}
+```
+
+Then ask Claude: **"Find AI contract roles in London outside IR35 over £600/day"**
+
+A managed hosted instance is on the way. Watch this repo for updates.
+
+---
+
+## Example
+
+```js
+search_jobs({
+  keywords: "AI engineer",
+  location: "London",
+  employmentType: "contract",
+  ir35Status: "outside",
+  rateMin: 600,
+  workMode: "hybrid"
+})
+```
+
+Returns structured job records — title, company, skills, rate range, IR35 status, source URL — ready for an AI agent to reason over directly.
+
+---
+
+## Tools
+
+### Public — no authentication required
+
+| Tool | Description |
+|---|---|
+| `search_jobs` | Search UK jobs by keyword, location, type, seniority, and pay |
+| `get_job_detail` | Full structured record for a job — skills, rate, IR35, source URL |
+| `get_market_rates` | Salary and day rate benchmarks by role, seniority, and region |
+| `get_skills_demand` | In-demand skills with job counts, avg rates, and trend direction |
+
+### Candidate — requires `candidate:read` scope
+
+| Tool | Description |
+|---|---|
+| `get_candidate_availability` | Read availability status and work preferences |
+| `update_availability` | Update availability status and start date |
+
+### Recruiter — requires `recruiter:read` or `recruiter:write` scope
+
+| Tool | Description |
+|---|---|
+| `post_job` | Create a new job listing |
+| `search_available_candidates` | Search candidates who have made availability public |
 
 ---
 
@@ -28,53 +101,7 @@ If you've ever sworn at a job board's profile page, this is for you.
 
 ---
 
-## What this is
-
-`uk-jobs-mcp` defines a standard interface for UK recruitment data exchange. Any AI assistant that supports MCP can connect to it and immediately:
-
-- Search UK job listings with rich filters
-- Retrieve structured job records
-- Get live market rate and salary data
-- Look up in-demand skills by region and role area
-- Read a candidate's availability and work preferences (with auth)
-- Post jobs and search available candidates (with auth)
-
-This is a **generic standard** — not tied to any one platform's proprietary data or algorithms. Any UK job board, ATS, or recruitment platform can implement the same interface over their own data.
-
----
-
-## Tools
-
-### Public — no authentication required
-
-| Tool | Description |
-|---|---|
-| `search_jobs` | Search UK jobs by keyword, location, type, seniority, and pay |
-| `get_job_detail` | Get the full structured record for a job by ID |
-| `get_market_rates` | Current salary and day rate data by role, seniority, and region |
-| `get_skills_demand` | Most in-demand skills with job counts and trend direction |
-
-### Candidate — requires `candidate:read` scope
-
-| Tool | Description |
-|---|---|
-| `get_candidate_availability` | Read availability status and work preferences |
-| `update_availability` | Update availability status and start date |
-
-### Recruiter — requires `recruiter:read` or `recruiter:write` scope
-
-| Tool | Description |
-|---|---|
-| `post_job` | Create a new job listing |
-| `search_available_candidates` | Search for candidates who have made availability public |
-
----
-
-## Connecting to this server
-
-A hosted public instance is coming soon. In the meantime, clone the repo and run it locally against your own data source.
-
-### Running locally
+## Running locally
 
 ```bash
 npm install
@@ -96,24 +123,9 @@ Test with the MCP Inspector:
 npm run inspector
 ```
 
-### Claude Desktop (local)
-
-Once running locally, add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "uk-jobs": {
-      "command": "npx",
-      "args": ["-y", "uk-jobs-mcp"]
-    }
-  }
-}
-```
-
 ### Deploying your own hosted instance
 
-Fork this repo, replace the stubs in `src/tools/` with queries to your own data source, and deploy to your platform of choice. Set the `BASE_URL` environment variable to your domain — the discovery endpoints and auth metadata will advertise it automatically.
+Fork this repo, replace the stubs in `src/tools/` with queries to your own data source, and deploy. Set the `BASE_URL` environment variable to your domain:
 
 ```bash
 BASE_URL=https://your-domain.com npm start
@@ -148,7 +160,7 @@ The client fetches the Protected Resource Metadata document to discover the auth
 
 ## Implementing this standard
 
-This MCP defines a schema, not an implementation. If you run a UK job board or recruitment platform and want to expose your data through the same interface, you can:
+This MCP defines a schema, not an implementation. If you run a UK job board or recruitment platform and want to expose your data through the same interface:
 
 1. Fork this repo
 2. Replace the stub functions in `src/tools/` with queries to your own data store
